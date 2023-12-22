@@ -1,0 +1,25 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+
+
+{% block title %}
+Single news
+{% endblock title %}
+
+
+{% block content %}
+<h1> Only one single news </h1>
+<h3>{{ time_now|date:'M d Y D' }}</h3>
+<hr>
+   {% if single_news %}
+
+               <h4>{{ single_news.post_name|censored }}</h4>
+               <h5>{{ single_news.time_of_creation|date:'M d Y D H:i' }}</h5>
+               <h4>{{ single_news.post_content|censored }}</h4>
+
+
+   {% else %}
+       <h2>Новость отсутствует!</h2>
+   {% endif %}
+
+{% endblock content %}
