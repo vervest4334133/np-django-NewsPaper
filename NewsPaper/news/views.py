@@ -1,10 +1,12 @@
 from datetime import datetime
-
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+
 from .models import *
 from .forms import NewsForm, ArticlesForm
 from .filters import PostFilter
+
 from django.http import HttpResponse
 
 
@@ -56,7 +58,9 @@ class PostDetails(DetailView):
 
 
 # Добавляем новое представление для создания статей. Для отображения формы из шаблона и forms.py.
-class NewsCreate(CreateView):
+class NewsCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('news.news_create',)
+    raise_exception = True
     # Указываем нашу разработанную форму, модель товаров и новый шаблон, в котором используется форма.
     form_class = NewsForm
     model = Post
@@ -71,7 +75,9 @@ class NewsCreate(CreateView):
         return super().form_valid(form)
 
 
-class ArticlesCreate(CreateView):
+class ArticlesCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('news.articles_create',)
+    raise_exception = True
     form_class = ArticlesForm
     model = Post
     template_name = 'articles_edit.html'
@@ -85,7 +91,9 @@ class ArticlesCreate(CreateView):
         return super().form_valid(form)
 
 
-class NewsUpdate(UpdateView):
+class NewsUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = ('news.news_update',)
+    raise_exception = True
     form_class = NewsForm
     model = Post
     template_name = 'news_edit.html'
@@ -99,7 +107,9 @@ class NewsUpdate(UpdateView):
         return super().form_valid(form)
 
 
-class ArticlesUpdate(UpdateView):
+class ArticlesUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = ('news.articles_update',)
+    raise_exception = True
     form_class = ArticlesForm
     model = Post
     template_name = 'articles_edit.html'
@@ -113,7 +123,9 @@ class ArticlesUpdate(UpdateView):
         return super().form_valid(form)
 
 
-class NewsDelete(DeleteView):
+class NewsDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('news.news_delete',)
+    raise_exception = True
     # form_class = NewsForm
     model = Post
     template_name = 'news_delete.html'
@@ -123,7 +135,9 @@ class NewsDelete(DeleteView):
     #     return reverse_lazy('news_list') #, kwargs={'pk': self.object.pk})
 
 
-class ArticlesDelete(DeleteView):
+class ArticlesDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('news.articles_delete',)
+    raise_exception = True
     model = Post
     template_name = 'articles_delete.html'
     success_url = "/news/"

@@ -29,6 +29,15 @@ News
 
 
 <hr>
+
+{% if perms.news.news_create %}
+    <a href="{% url 'news_create' %}">Добавить новость.</a>
+    {% endif %}
+
+{% if perms.news.articles_create %}
+    <a href="{% url 'articles_create' %}">Добавить статью.</a>
+    {% endif %}
+
    {% if news %}
            {% for single_news in news %}
                <h4>{{ single_news.post_name|censored }}</h4>
