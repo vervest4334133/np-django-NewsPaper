@@ -23,18 +23,33 @@
                aria-label="Toggle navigation">
            <span class="navbar-toggler-icon"></span>
        </button>
+
        <div class="collapse navbar-collapse" id="navbarResponsive">
            <ul class="navbar-nav ml-auto">
+
                <li class="nav-item active">
                    <a class="nav-link" href="#">Home
                        <span class="sr-only">(current)</span>
                    </a>
                </li>
+
                <li class="nav-item">
                    <a class="nav-link" href="/news/">News</a>
                </li>
+
+               {% if request.user.is_authenticated %}
+               <li class="nav-item">
+                   <a class="nav-link" href="/accounts/logout/">Exit <h7>{{ user.username }}</h7></a>
+               </li>
+               {% else %}
+               <li class="nav-item">
+                   <a class="nav-link" href="/accounts/login/">Login</a>
+               </li>
+               {% endif %}
+
            </ul>
        </div>
+
    </div>
 </nav>
         <!-- Page content-->

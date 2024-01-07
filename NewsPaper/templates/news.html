@@ -38,16 +38,26 @@ News
     <a href="{% url 'articles_create' %}">Добавить статью.</a>
     {% endif %}
 
+<ul class="list-group list-group-flush">
    {% if news %}
            {% for single_news in news %}
-               <h4>{{ single_news.post_name|censored }}</h4>
-               <h5>{{ single_news.time_of_creation|date:'M d Y D H:i' }}</h5>
-               <h4>{{ single_news.post_content|censored|truncatewords:20 }}</h4>
-
+           <li class="list-group-item">
+               <small class="fw-bold">{{ single_news.time_of_creation|date:'M d Y D H:i' }}</small>
+               <a href="{% url 'post_detail' single_news.id%}">{{ single_news.post_name|censored }}</a>
+               <small class="text-muted">автор: {{single_news.author_post}} </small> <br>
+               <small class="fw-bold">категории:
+                   {% for post_category in single_news.post_category.all%}
+                        <a href="{% url 'category_list' post_category.id %}"> {{ post_category }} </a>
+                   {% endfor%}
+               </small>
+               <p>{{ single_news.post_content|censored|truncatewords:20 }}</p>
+           </li>
            {% endfor %}
    {% else %}
        <h2>Новостей нет!</h2>
    {% endif %}
+</ul>
+
 
 
 {# Добавляем пагинацию на страницу. Информация о предыдущих страницах.#}

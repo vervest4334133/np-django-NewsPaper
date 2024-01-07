@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -40,13 +41,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.flatpages',
-    'news',
+    'news.apps.NewsConfig',
     'accounts',
     'django_filters',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.yandex',
+    'django_apscheduler',
 ]
 
 SITE_ID = 1
@@ -144,12 +146,30 @@ STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
 
+SITE_URL = 'http://127.0.0.1:8000/'
+
 LOGIN_REDIRECT_URL = "/news"
+LOGOUT_REDIRECT_URL = '/accounts/login'
+# LOGOUT_URL = reverse_lazy('logout')
 
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_VERIFICATION = 'optional'                   #none, mandatory
+ACCOUNT_CONFIRM_EMAIL_ON_GET = False   #избежать дополнительного входа и активирует аккаунт сразу, как только мы перейдём по ссылке
 
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  #куда отправляет письма
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = "vervest4334133@yandex.ru"
+EMAIL_HOST_PASSWORD = "gapzwxurcfnteawc"
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_SUBJECT_PREFIX = 'NewsPaperProject'
+DEFAULT_FROM_EMAIL = "vervest4334133@yandex.ru"
+
+SERVER_EMAIL = "vervest4334133@yandex.ru"

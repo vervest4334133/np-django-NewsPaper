@@ -1,6 +1,10 @@
 from datetime import datetime
+
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-from django.urls import reverse_lazy
+from django.db.models import Exists, OuterRef
+from django.shortcuts import render, get_object_or_404
+from django.views.decorators.csrf import csrf_protect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from .models import *
@@ -142,3 +146,43 @@ class ArticlesDelete(PermissionRequiredMixin, DeleteView):
     template_name = 'articles_delete.html'
     success_url = "/news/"
 
+
+class CategoryList(LoginRequiredMixin, ListView):
+    model = Post
+    ordering = 'time_of_creation'
+    template_name = 'category_list.html'
+    context_object_name = 'category_news_list'
+    paginate_by = 10
+
+    def get_queryset(self):
+        self.category = get_object_or_404(Category, id=self.kwargs['pk'])         #профилактика ошибки 500
+        queryset = Post.objects.filter(post_category=self.category).order_by('time_of_creation')
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_not_subscriber'] = self.request.user not in self.category.subscribers.all()
+        context['category'] = self.category
+        return context
+
+
+@login_required()
+def subscribe(request, pk):
+    user = request.user
+    category = Category.objects.get(id=pk)
+    category.subscribers.add(user)
+
+    message = 'Вы успешно подписались на рассылку публикаций категории '
+
+    return render(request, 'subscribe.html', {'category': category, 'message': message})
+
+
+@login_required()
+def unsubscribe(request, pk):
+    user = request.user
+    category = Category.objects.get(id=pk)
+    category.subscribers.remove(user)
+
+    message = 'Вы успешно отписались от рассылки публикаций категории '
+
+    return render(request, 'subscribe.html', {'category': category, 'message': message})
