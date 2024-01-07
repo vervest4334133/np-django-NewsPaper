@@ -1,0 +1,9 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}Logged out{% endblock %}
+{% block content %}
+    <form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit">logout</button>
+</form>
+{% endblock %}
