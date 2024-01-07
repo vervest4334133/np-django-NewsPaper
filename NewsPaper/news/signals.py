@@ -26,7 +26,7 @@ def send_notifications(preview, pk, title, subscribers):
 @receiver(m2m_changed, sender=PostCategory)
 def new_post_released(sender, instance: list[str], **kwargs):
     if kwargs['action'] == 'post_add':
-        categories = instance.category.all()
+        categories = instance.post_category.all()
         subscribers = []
 
         for category in categories:
