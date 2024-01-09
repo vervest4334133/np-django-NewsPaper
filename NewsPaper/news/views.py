@@ -166,6 +166,26 @@ class CategoryList(LoginRequiredMixin, ListView):
         return context
 
 
+class SubscriptionsList(LoginRequiredMixin, ListView):
+    model = Category
+    ordering = 'category_name'
+    template_name = 'subscriptions.html'
+    context_object_name = 'subscriptions'
+
+    def get_queryset(self):
+        categories_id = Category.objects.in_bulk()
+        for id in categories_id:
+            self.category = categories_id[id]
+        queryset = Category.objects.all().order_by('category_name')
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_not_subscriber'] = self.request.user not in self.category.subscribers.all()
+        context['category'] = self.category
+        return context
+
+
 @login_required()
 def subscribe(request, pk):
     user = request.user
@@ -186,3 +206,35 @@ def unsubscribe(request, pk):
     message = 'Вы успешно отписались от рассылки публикаций категории '
 
     return render(request, 'subscribe.html', {'category': category, 'message': message})
+
+
+
+
+
+
+# @login_required
+# @csrf_protect
+# def subscriptions(request):
+#
+#     if request.method == 'POST':
+#         category_id = request.POST.get('category_name_id')
+#         action = request.POST.get('action')
+#         user = request.user
+#
+#         if action == 'subscribe':
+#             category = Category.objects.get(id=category_id)
+#             category.subscribers.add(user)
+#             message = 'Вы успешно подписались на рассылку публикаций категории '
+#             return render(request, 'subscribe.html', {'category': category, 'message': message})
+#
+#         elif action == 'unsubscribe':
+#             category = Category.objects.get(id=category_id)
+#             category.subscribers.remove(user)
+#             message = 'Вы успешно отписались от рассылки публикаций категории '
+#             return render(request, 'subscribe.html', {'category': category, 'message': message})
+#
+#     categories_with_subscriptions = Category.objects.annotate(
+#         user_subscribed=Exists(
+#             Category.subscribers.get(subscribers=request.user, category_name=OuterRef('pk'))))
+#
+#     return render(request,'subscriptions.html',{'categories': categories_with_subscriptions})

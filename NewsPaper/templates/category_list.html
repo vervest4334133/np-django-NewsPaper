@@ -1,5 +1,4 @@
 {% extends 'flatpages/default.html' %}
-
 {% load custom_filters %}
 {% load custom_tags %}
 
@@ -11,6 +10,7 @@ Categories
 {% block content %}
 
 <h1>Categories</h1>
+<h3>Вы смотрите публикации категории: {{ category.category_name }}!!!</h3>
 
 {% if is_not_subscriber %}
 <p class="text_center"><a href="{% url 'subscribe' category.id %}" class="btn btn-secondary btn-sm">Подписаться на категорию</a> </p>

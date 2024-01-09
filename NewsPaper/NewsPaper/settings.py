@@ -161,8 +161,8 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = False   #избежать дополнитель�
 
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  #куда отправляет письма
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  #куда отправляет письма
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
 EMAIL_HOST_USER = "vervest4334133@yandex.ru"
@@ -174,5 +174,6 @@ DEFAULT_FROM_EMAIL = "vervest4334133@yandex.ru"
 
 SERVER_EMAIL = "vervest4334133@yandex.ru"
 
-APSCHEDULER_DATETIME_FORMAT = 'N, j, Y, f:s a'
+APSCHEDULER_DATETIME_FORMAT = 'N j, Y, f:s a'
 APSCHEDULER_RUN_NOW_TIMEOUT = 25
+USE_TZ = False

@@ -1,6 +1,7 @@
 import logging
 import datetime
 
+from django.utils import timezone
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from django.conf import settings
@@ -11,7 +12,7 @@ from django_apscheduler import util
 from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
 
-from NewsPaper.news.models import Post, Category
+from news.models import Post, Category
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +45,7 @@ class Command(BaseCommand):
 
         scheduler.add_job(
             my_job,
-            trigger=CronTrigger(),  # ВРЕМЯ СРАБАТЫВАНИЯ day_of_week="fri", hour="18", minute="00"
+            trigger=CronTrigger(day_of_week="fri", hour="18", minute="00"),  # ВРЕМЯ СРАБАТЫВАНИЯ
             id="my_job",  # The `id` assigned to each job MUST be unique
             max_instances=1,
             replace_existing=True,
