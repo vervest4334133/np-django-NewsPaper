@@ -1,0 +1,29 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+{% load custom_tags %}
+
+{% block title %}
+<h2>Subscriptions</h2>
+{% endblock title %}
+
+{% block content %}
+<h1>Subscriptions</h1>
+<hr>
+<ul class="list-group list-group-flush">
+
+           {% for categories in subscriptions %}
+           <li class="list-group-item">
+
+               {{ categories.category_name }}
+
+               {% if is_not_subscriber %}
+                   <p class="text_center"><a href="{% url 'subscribe' category.id %}" class="btn btn-secondary btn-sm">Подписаться на категорию</a> </p>
+               {% else %}
+                   <p class="text_center"><a href="{% url 'unsubscribe' category.id %}" class="btn btn-secondary btn-sm">Отписаться от рассылки</a> </p>
+               {% endif %}
+
+           </li>
+           {% endfor %}
+
+</ul>
+{% endblock content %}
