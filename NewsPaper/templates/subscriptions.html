@@ -16,10 +16,10 @@
 
                {{ categories.category_name }}
 
-               {% if is_not_subscriber %}
-                   <p class="text_center"><a href="{% url 'subscribe' category.id %}" class="btn btn-secondary btn-sm">Подписаться на категорию</a> </p>
+               {% if not request.user in categories.subscribers.all %}
+                   <p class="text_center"><a href="{% url 'subscribe' categories.id %}" class="btn btn-secondary btn-sm">Подписаться на категорию</a> </p>
                {% else %}
-                   <p class="text_center"><a href="{% url 'unsubscribe' category.id %}" class="btn btn-secondary btn-sm">Отписаться от рассылки</a> </p>
+                   <p class="text_center"><a href="{% url 'unsubscribe' categories.id %}" class="btn btn-secondary btn-sm">Отписаться от рассылки</a> </p>
                {% endif %}
 
            </li>

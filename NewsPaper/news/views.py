@@ -173,17 +173,8 @@ class SubscriptionsList(LoginRequiredMixin, ListView):
     context_object_name = 'subscriptions'
 
     def get_queryset(self):
-        categories_id = Category.objects.in_bulk()
-        for id in categories_id:
-            self.category = categories_id[id]
         queryset = Category.objects.all().order_by('category_name')
         return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['is_not_subscriber'] = self.request.user not in self.category.subscribers.all()
-        context['category'] = self.category
-        return context
 
 
 @login_required()
