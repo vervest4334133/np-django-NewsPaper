@@ -177,3 +177,10 @@ SERVER_EMAIL = "vervest4334133@yandex.ru"
 APSCHEDULER_DATETIME_FORMAT = 'N j, Y, f:s a'
 APSCHEDULER_RUN_NOW_TIMEOUT = 25
 USE_TZ = False
+
+
+CELERY_BROKER_URL = 'redis-cli -u redis://default:r5VwCtrbavTBubNQek6xfCzLB2P0IXAD@redis-17459.c322.us-east-1-2.ec2.cloud.redislabs.com:17459'
+CELERY_RESULT_BACKEND = 'redis-cli -u redis://default:r5VwCtrbavTBubNQek6xfCzLB2P0IXAD@redis-17459.c322.us-east-1-2.ec2.cloud.redislabs.com:17459'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
