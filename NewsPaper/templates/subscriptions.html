@@ -2,10 +2,15 @@
 {% load custom_filters %}
 {% load custom_tags %}
 
-{% block title %}
-<h2>Subscriptions</h2>
-{% endblock title %}
+{% load cache %}
+    {% cache 60 title %}
+        {% block title %}
+        <h2>Subscriptions</h2>
+        {% endblock title %}
+{% endcache %}
 
+{% load cache %}
+    {% cache 10 content %}
 {% block content %}
 <h1>Subscriptions</h1>
 <hr>
@@ -27,3 +32,4 @@
 
 </ul>
 {% endblock content %}
+{% endcache %}

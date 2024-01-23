@@ -9,15 +9,14 @@ News
 {% endblock title %}
 
 
-
 <!-- В контенте на странице мы выводим все статьи и новости -->
 {% block content %}
 
 <h1>News</h1>
 
-<h3>{{ time_now|date:'M d Y D' }}</h3>
-<h3>Всего новостей: {{ count_news|length }}</h3>
-<h3>{{ news_count|default_if_none:"Новостей нет!" }} </h3>
+<h5>{{ time_now|date:'M d Y D' }}</h5>
+<h5>Всего новостей: {{ count_news|length }}</h5>
+<h5>{{ news_count|default_if_none:"Новостей нет!" }} </h5>
 
 {# Добавляем форму, которая объединяет набор полей, которые будут отправляться в запросе #}
    <form action="" method="get">
@@ -51,6 +50,7 @@ News
                    {% endfor%}
                </small>
                <p>{{ single_news.post_content|censored|truncatewords:20 }}</p>
+               <p>Рейтинг публикации: {{ single_news.rating }}.</p>
            </li>
            {% endfor %}
    {% else %}

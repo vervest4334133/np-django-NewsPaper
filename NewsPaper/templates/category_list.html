@@ -2,11 +2,16 @@
 {% load custom_filters %}
 {% load custom_tags %}
 
-{% block title %}
-Categories
-{% endblock title %}
+{% load cache %}
+    {% cache 60 title %}
+        {% block title %}
+        Categories
+        {% endblock title %}
+{% endcache %}
 
 
+{% load cache %}
+    {% cache 10 content %}
 {% block content %}
 
 <h1>Categories</h1>
@@ -60,3 +65,4 @@ Categories
 
 
 {% endblock content %}
+{% endcache %}

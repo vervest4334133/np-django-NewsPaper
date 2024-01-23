@@ -146,6 +146,13 @@ STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'cache_files'), # Указываем, куда будем сохранять кэшируемые файлы! Не забываем создать папку cache_files внутри папки с manage.py!
+    }
+}
+
 SITE_URL = 'http://127.0.0.1:8000/'
 
 LOGIN_REDIRECT_URL = "/news"

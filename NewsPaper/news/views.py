@@ -7,10 +7,11 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
+
 from .models import *
 from .forms import NewsForm, ArticlesForm
 from .filters import PostFilter
-
+from django.core.cache import cache
 from django.http import HttpResponse
 
 
@@ -49,16 +50,26 @@ class PostList(ListView):
 class PostDetails(DetailView):
     # Модель всё та же, но мы хотим получать информацию по отдельному товару
     model = Post
-    # Используем другой шаблон — product.html
+    # Используем другой шаблон
     template_name = 'single_news.html'
     # Название объекта, в котором будет выбранный пользователем продукт
     context_object_name = 'single_news'
+    queryset = Post.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['time_now'] = datetime.utcnow()
+        context['comments'] = Comment.objects.filter(post__id=self.kwargs['pk']).order_by('comment_date')
 
         return context
+
+    def get_object(self, *args, **kwargs):
+        obj = cache.get(f'post-{self.kwargs["pk"]}', None)  # кэш очень похож на словарь, и метод get действует так же. Он забирает значение по ключу, если его нет, то забирает None.
+        # если объекта нет в кэше, то получаем его и записываем в кэш
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'post-{self.kwargs["pk"]}', obj)
+            return obj
 
 
 # Добавляем новое представление для создания статей. Для отображения формы из шаблона и forms.py.
