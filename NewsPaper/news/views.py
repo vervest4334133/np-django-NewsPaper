@@ -1,15 +1,19 @@
 from datetime import datetime
 
+from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Exists, OuterRef
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.template.context_processors import request
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-
+from django.views.generic.edit import ModelFormMixin
 
 from .models import *
-from .forms import NewsForm, ArticlesForm
+from .forms import NewsForm, ArticlesForm, CommentForm
 from .filters import PostFilter
 from django.core.cache import cache
 from django.http import HttpResponse
@@ -55,13 +59,22 @@ class PostDetails(DetailView):
     # Название объекта, в котором будет выбранный пользователем продукт
     context_object_name = 'single_news'
     queryset = Post.objects.all()
+    comment_form = CommentForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['time_now'] = datetime.utcnow()
         context['comments'] = Comment.objects.filter(post__id=self.kwargs['pk']).order_by('comment_date')
+        context['form'] = self.comment_form
 
         return context
+
+    def form_valid(self, form):
+        form.save(commit=False)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('post_detail', kwargs={'pk': self.object.pk})
 
     def get_object(self, *args, **kwargs):
         obj = cache.get(f'post-{self.kwargs["pk"]}', None)  # кэш очень похож на словарь, и метод get действует так же. Он забирает значение по ключу, если его нет, то забирает None.
@@ -69,7 +82,36 @@ class PostDetails(DetailView):
         if not obj:
             obj = super().get_object(queryset=self.queryset)
             cache.set(f'post-{self.kwargs["pk"]}', obj)
-            return obj
+        return obj
+
+
+# @login_required
+# @require_http_methods(["POST"])
+# def add_comment(request, post_id):
+#     form = CommentForm(request.POST)
+#     post = get_object_or_404(Post, id=post_id)
+#
+#     if form.is_valid():
+#         comment = Comment()
+#         comment.path = []
+#         comment.post_id = post
+#         comment.user_id = auth.get_user(request)
+#         comment.comment_text = form.cleaned_data['comment_area']
+#         comment.save()
+#
+#         # Django не позволяет увидеть ID комментария по мы не сохраним его,
+#         # хотя PostgreSQL имеет такие средства в своём арсенале, но пока не будем
+#         # работать с сырыми SQL запросами, поэтому сформируем path после первого сохранения
+#         # и пересохраним комментарий
+#         try:
+#             comment.path.extend(Comment.objects.get(id=form.cleaned_data['parent_comment']).path)
+#             comment.path.append(comment.id)
+#         except ObjectDoesNotExist:
+#             comment.path.append(comment.id)
+#
+#         comment.save()
+#
+#     return redirect(post.get_absolute_url())
 
 
 # Добавляем новое представление для создания статей. Для отображения формы из шаблона и forms.py.
@@ -209,6 +251,22 @@ def unsubscribe(request, pk):
 
     return render(request, 'subscribe.html', {'category': category, 'message': message})
 
+
+class NewsCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('news.news_create',)
+    raise_exception = True
+    # Указываем нашу разработанную форму, модель товаров и новый шаблон, в котором используется форма.
+    form_class = NewsForm
+    model = Post
+    template_name = 'news_edit.html'
+
+    def get_success_url(self):
+        return reverse_lazy('post_detail', kwargs={'pk': self.object.pk})
+
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        post.post_type = 'NE'
+        return super().form_valid(form)
 
 
 

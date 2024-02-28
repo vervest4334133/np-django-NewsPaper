@@ -69,28 +69,31 @@ class ArticlesForm(forms.ModelForm):
        return post_name
 
 
-# class CommentForm(forms.ModelForm):
-#    class Meta:
-#        model = Comment
-#        fields = [
-#            'comment_text',
-#        ]
+# class CommentForm(forms.Form):
+#     parent_comment = forms.IntegerField(
+#         widget=forms.HiddenInput,
+#         required=False
+#     )
 #
-#    def clean(self):
-#        cleaned_data = super().clean()
-#        comment_text = cleaned_data.get("comment_text")
-#        if comment_text is not None and len(comment_text) < 5:
-#            raise ValidationError({
-#                "comment_text": "Содержание комментария не может быть менее 5 символов."
-#            })
-#
-#        return cleaned_data
+#     comment_area = forms.CharField(
+#         label="",
+#         widget=forms.Textarea
+#     )
 
-   # def clean_name(self):
-   #     comment_text = self.cleaned_data["post_name"]
-   #     if post_name[0].islower():
-   #         raise ValidationError(
-   #             "Название должно начинаться с заглавной буквы"
-   #         )
-   #
-   #     return post_name
+class CommentForm(forms.ModelForm):
+   class Meta:
+       model = Comment
+       fields = [
+           'comment_text',
+       ]
+
+   def clean(self):
+       cleaned_data = super().clean()
+       comment_text = cleaned_data.get("comment_text")
+       if comment_text is not None and len(comment_text) < 5:
+           raise ValidationError({
+               "comment_text": "Содержание комментария не может быть менее 5 символов."
+           })
+
+       return cleaned_data
+

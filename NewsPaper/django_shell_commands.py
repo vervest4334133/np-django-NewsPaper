@@ -84,3 +84,4 @@ best_article_preview = Post.objects.order_by('-rating')[0].preview()
 all_com = Post.objects.order_by('-rating')[0].comment_set.all().values('comment_date', 'user__username', 'rating', 'comment_text')
 
 # Post.objects.order_by('-rating')[0].comment_set.all()
+#python -Xutf8 manage.py dumpdata > data.json

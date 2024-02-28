@@ -18,6 +18,12 @@ Single news
                <h4>{{ single_news.post_content|censored }}</h4>
                <p>Рейтинг публикации: {{ single_news.rating }}.</p>
 
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Save" />
+</form>
+
                {% if comments %}
                    {% for com in comments %}
                    <small class="fw-bold">Пользователь {{ com.user }} прокомментировал:</small> <br>

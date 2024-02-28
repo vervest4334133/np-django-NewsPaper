@@ -54,6 +54,11 @@ class Post(models.Model):
     rating = models.IntegerField(default=0)
     time_of_creation = models.DateTimeField(auto_now_add=True)
 
+    # допишем свойство, которое будет отображать есть ли товар на складе
+    # @property
+    # def on_stock(self):
+    #     return self.quantity > 0
+
     def preview(self):
         return f'{self.post_content[0:123]}...'
 
@@ -90,6 +95,9 @@ class Comment(models.Model):
     comment_text = models.TextField()
     comment_date = models.DateTimeField(auto_now_add=True)
     rating = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.comment_text
 
     def like(self):
         self.rating += 1
