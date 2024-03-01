@@ -94,14 +94,14 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': 'errors.log',
             'formatter': 'error_critical',
-            'filters': ['require_debug_false']
+            'filters': ['require_debug_true']
         },
         'security_log': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': 'security.log',
             'formatter': 'general',
-            'filters': ['require_debug_false']
+            'filters': ['require_debug_true']
         },
         'admin_mail': {
             'level': 'ERROR',
@@ -136,8 +136,10 @@ LOGGING = {
     }
 }
 
+ADMINS = [("Admin", "vervest4334133@yandex.ru")]
 
 ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
