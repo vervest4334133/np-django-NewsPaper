@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import *
+from modeltranslation.admin import TranslationAdmin # импортируем модель амдинки
 
 
 # напишем уже знакомую нам функцию обнуления товара на складе
@@ -19,10 +20,18 @@ class PostAdmin(admin.ModelAdmin):
     actions = [nullfy_rating]
 
 
+class PostTranslation(TranslationAdmin):
+    model = Post
+
+
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['category_name']
     list_filter = ['category_name']
     search_fields = ['category_name']
+
+
+class CategoryTranslation(TranslationAdmin):
+    model = Category
 
 
 class AuthorAdmin(admin.ModelAdmin):
@@ -37,6 +46,10 @@ class CommentAdmin(admin.ModelAdmin):
     search_fields = ('comment_text', 'user', 'comment_date')
 
 
+class CommentTranslation(TranslationAdmin):
+    model = Comment
+
+
 class PostCategoryAdmin(admin.ModelAdmin):
     list_display = ('post', 'category')
     list_filter = ('post', 'category')
@@ -44,6 +57,7 @@ class PostCategoryAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Post, PostAdmin) #При регистрации вторым аргументом указывать класс модель-админа
+#admin.site.register(Post, PostTranslation) - так не надо
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Author, AuthorAdmin)
 admin.site.register(Comment, CommentAdmin)

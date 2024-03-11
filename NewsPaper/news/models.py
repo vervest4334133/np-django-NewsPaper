@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.urls import reverse, reverse_lazy
 from django.core.cache import cache
+from django.utils.translation import gettext as _
+from django.utils.translation import pgettext_lazy # импортируем «ленивый» геттекст с подсказкой
 
 
 class Author(models.Model):
@@ -30,7 +32,7 @@ class Author(models.Model):
 
 
 class Category(models.Model):
-    category_name = models.CharField(max_length=64, unique=True)
+    category_name = models.CharField(max_length=64, unique=True, help_text=_('category name'))
     subscribers = models.ManyToManyField(User, related_name='categories')
 
     def __str__(self):
@@ -38,7 +40,8 @@ class Category(models.Model):
 
 
 class Post(models.Model):
-    author_post = models.ForeignKey(Author, on_delete=models.CASCADE)
+    author_post = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='authors',
+        verbose_name=pgettext_lazy('help text for Post model', 'This is the help text'))
     post_category = models.ManyToManyField(Category, through='PostCategory')
 
     NEWS = 'NE'
@@ -49,7 +52,7 @@ class Post(models.Model):
     )
 
     post_type = models.CharField(max_length=2, choices=CATEGORY_CHOICES, default=ARTICLE)
-    post_name = models.CharField(max_length=255)
+    post_name = models.CharField(max_length=255, help_text=_('post name'))
     post_content = models.TextField()
     rating = models.IntegerField(default=0)
     time_of_creation = models.DateTimeField(auto_now_add=True)
@@ -82,8 +85,10 @@ class Post(models.Model):
 
 
 class PostCategory(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='posts',
+        verbose_name=pgettext_lazy('help text for PostCategory model', 'This is the help text'))
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='categories',
+        verbose_name=pgettext_lazy('help text for PostCategory model', 'This is the help text'))
 
     def __str__(self):
         return self.category.category_name.title()

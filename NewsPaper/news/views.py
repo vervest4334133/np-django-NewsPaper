@@ -7,16 +7,27 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Exists, OuterRef
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.context_processors import request
+from django.views import View
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.views.generic.edit import ModelFormMixin
+from django.utils.translation import gettext as _       # импортируем функцию для перевода
 
+from rest_framework import viewsets
+from rest_framework import permissions
+
+from .serializers import *
 from .models import *
 from .forms import NewsForm, ArticlesForm, CommentForm
 from .filters import PostFilter
 from django.core.cache import cache
 from django.http import HttpResponse
+
+from django.utils import timezone
+from django.shortcuts import redirect
+
+import pytz  # импортируем стандартный модуль для работы с часовыми поясами
 
 
 class PostList(ListView):
@@ -48,7 +59,14 @@ class PostList(ListView):
         context['count_news'] = all_news
         context['news_count'] = f"Всего новостей - {len(all_news)}"
         context['filterset'] = self.filterset  # Добавляем в контекст объект фильтрации.
+        context['current_time'] = timezone.now()
+        context['timezones'] = pytz.common_timezones
         return context
+
+    #  по пост-запросу будем добавлять в сессию часовой пояс, который и будет обрабатываться написанным нами ранее middleware
+    def post(self, request):
+        request.session['django_timezone'] = request.POST['timezone']
+        return redirect('/news/')
 
 
 class PostDetails(DetailView):
@@ -269,32 +287,51 @@ class NewsCreate(PermissionRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
+class AuthorViewSet(viewsets.ModelViewSet):
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-# @login_required
-# @csrf_protect
-# def subscriptions(request):
-#
-#     if request.method == 'POST':
-#         category_id = request.POST.get('category_name_id')
-#         action = request.POST.get('action')
-#         user = request.user
-#
-#         if action == 'subscribe':
-#             category = Category.objects.get(id=category_id)
-#             category.subscribers.add(user)
-#             message = 'Вы успешно подписались на рассылку публикаций категории '
-#             return render(request, 'subscribe.html', {'category': category, 'message': message})
-#
-#         elif action == 'unsubscribe':
-#             category = Category.objects.get(id=category_id)
-#             category.subscribers.remove(user)
-#             message = 'Вы успешно отписались от рассылки публикаций категории '
-#             return render(request, 'subscribe.html', {'category': category, 'message': message})
-#
-#     categories_with_subscriptions = Category.objects.annotate(
-#         user_subscribed=Exists(
-#             Category.subscribers.get(subscribers=request.user, category_name=OuterRef('pk'))))
-#
-#     return render(request,'subscriptions.html',{'categories': categories_with_subscriptions})
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+class NewsViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.filter(post_type='NE')
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+class ArticlesViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.filter(post_type='AR')
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    #permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        post_type = self.request.query_params.get('post_type', None)
+        if post_type is not None:
+            queryset = queryset.filter(post_type=post_type)
+        return queryset
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
